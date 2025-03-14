@@ -1,0 +1,46 @@
+
+package biblioMVC.view;
+
+import biblioMVC.model.Livro;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ListarLivrosDB {
+    public static void main(String[] args) {
+        String url = "jdbc:sqlite:biblioteca.db"; // Caminho do banco de dados SQLite
+
+        List<Livro> livros = new ArrayList<>();
+
+        // Conectando ao banco de dados e recuperando os livros
+        try (Connection conexao = DriverManager.getConnection(url)) {
+            String sql = "SELECT * FROM livros";
+            try (Statement stmt = conexao.createStatement();
+                 ResultSet resultado = stmt.executeQuery(sql)) {
+
+                while (resultado.next()) {
+                    Livro livro = new Livro(
+                        resultado.getString("titulo"),
+                        resultado.getString("autor"),
+                        resultado.getInt("ano")
+                    );
+                    livro.setId(resultado.getInt("id")); // Definindo o ID do livro
+                    livros.add(livro);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao acessar o banco de dados: " + e.getMessage());
+            return;
+        }
+
+        // Exibindo os livros na tela
+        System.out.println("Lista de Livros do Banco de Dados:");
+        for (Livro livro : livros) {
+            System.out.println("ID: " + livro.getId());
+            System.out.println("Título: " + livro.getTitulo());
+            System.out.println("Autor: " + livro.getAutor());
+            System.out.println("Ano: " + livro.getAno());
+            System.out.println("----------------------");
+        }
+    }
+}
